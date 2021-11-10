@@ -1,0 +1,155 @@
+import tkinter as tk
+from tkinter import *
+from tkinter import messagebox
+import cv2
+from PIL import ImageTk,Image
+from otp import *
+LARGE_FONT = ("Courier", 24)
+
+class SeaofBTCapp(tk.Tk):
+
+    def __init__(self, *args, **kwargs):
+        tk.Tk.__init__(self, *args, **kwargs)
+
+        container = tk.Frame(self,width=640,height=580)
+
+        container.pack(side="top", fill="both", expand=True)
+
+        container.grid_rowconfigure(0, weight=1)
+        container.grid_columnconfigure(0, weight=1)
+        container.grid_propagate(0)
+
+        self.frames = {}
+        for F in (StartPage,PageTwo ,PageTransaction,PageOne):     #enter here calssssssss...................................
+            frame = F(container, self)
+
+            self.frames[F] = frame
+
+            frame.grid(row=0, column=0, sticky="nsew")
+
+        self.show_frame(StartPage)
+
+    def show_frame(self, cont):
+        frame = self.frames[cont]
+        frame.tkraise()
+
+
+
+
+class StartPage(tk.Frame): #  start frame :- logging page
+
+    def __init__(self, parent, controller):
+
+        tk.Frame.__init__(self, parent)
+        def exit_button():
+            self.quitAll()
+
+        label = tk.Label(self, text="Face Reconition based ATM System", font=LARGE_FONT,fg="#BDBDBD",bg="black")
+        label.pack(pady=20, padx=10)
+
+        button1 = tk.Button(self, text="Login User",font=("Courier",50) ,bd=15,command=lambda: controller.show_frame(PageTwo))
+        button1.configure(background = "#757575")
+        button1.pack(pady=90, side="top")
+        button_qwer = tk.Button(self, text="close",bd=5, command=self.quit)
+        button_qwer.pack(pady=10,padx=100,side="top")
+
+
+
+
+class PageOne(tk.Frame):  # OTP VERIFIACTION
+
+    def __init__(self, parent, controller):
+        ment = tk.StringVar()
+        import otp
+        self.OTPP=OTPP
+        def OTP_vertify():
+            if self.OTPP == int(ment.get()):
+                label_balance.configure(text="OTP VERFIFIACTIN Succesful ")
+                tk.messagebox.showinfo(title="OTP", message= "succesful")
+                button1.configure(text="click to withdraw Proceed", command=lambda: controller.show_frame(PageTransaction))
+            elif self.OTPP != int(ment.get()):
+                label_balance.configure(text="try again")
+                button1.configure(text="BACK TO CAMERA",command=lambda: controller.show_frame(OTP_vertify()))   # add here 3time alrt massage box
+
+        tk.Frame.__init__(self, parent, bg="white")
+        label = tk.Label(self, text="OTP METHODS", font=LARGE_FONT, fg="#BDBDBD", bg="#C2185B")
+        label.pack(pady=20, padx=10)
+
+        label_balance = tk.Label(self, text=" " , font=LARGE_FONT, fg="#BDBDBD", bg="white")
+
+
+        button1 = tk.Button(self, text="SUBMMIT OTP",bd=15, font=("Courier", 30), background="#757575", command=lambda: OTP_vertify())
+        button1.pack(pady=30, side="top")
+
+        entry = tk.Entry(self, textvariable=ment, bg="#E91E63").pack(ipady=20, side="top") #""""""""""""""""
+
+
+        button_qwer = tk.Button(self, text="close", command=self.quit)
+        button_qwer.place(relx=0.5, anchor=tk.CENTER)
+        button_qwer.pack(side="left", padx=20, pady=50)
+
+
+class PageTwo(tk.Frame):  # logging user otp add here
+
+    def __init__(self, parent, controller):
+
+        def detector():
+            import detector
+            n = detector.start()
+            m=detector
+            if type(n)!=None:
+                label.configure(text = "Welcome "+str())
+                button2.configure(text="Proceed to OTP",bd=15,command=lambda: controller.show_frame(PageOne))
+
+            else:
+                label.configure(text="Retry")
+        tk.Frame.__init__(self, parent,bg = "white")
+        label = tk.Label(self, text="Open Camera to login", font=LARGE_FONT,fg="#BDBDBD",bg="#C2185B")
+        label.pack(pady=20, padx=10)
+
+        button1 = tk.Button(self, text="Back to Home",bd=15,font = ("Courier",30),background="#757575",
+                            command=lambda: controller.show_frame(StartPage))
+        button1.pack(pady=20)
+
+        button2 = tk.Button(self, text="Click to open camera",bd=15,font = ("Courier",30),background="#757575",
+                            command=detector)
+        button2.pack(pady=20)
+        button_qwer = tk.Button(self, text="close", command=self.quit)
+        button_qwer.place(relx=0.5, anchor=tk.CENTER)
+        button_qwer.pack(side="left", padx=20, pady=50)
+
+class PageTransaction(tk.Frame): #  money transaction
+
+    def __init__(self, parent, controller):
+        ment = tk.StringVar()
+        import random
+        self.number = random.randint(1000, 1000000)
+        def withdraw():
+            if self.number>=int(ment.get()):
+                self.number = self.number-int(ment.get())
+                label_balance.configure(text="Transaction Succesful. \nBalance: " +str(self.number))
+
+            else:
+                label_balance.configure(text="Insuffecient Balance")
+
+        tk.Frame.__init__(self, parent,bg = "#C2185B")
+        label = tk.Label(self, text="Account Summary", font=LARGE_FONT,fg="#BDBDBD",bg="#C2185B")
+        label.pack(pady=20, padx=10)
+
+        label_balance = tk.Label(self, text="Current Balance:" + str(self.number), font=LARGE_FONT, fg="#BDBDBD", bg="#C2185B")
+        label_balance.pack(pady=20, padx=10)
+        button1 = tk.Button(self, text="Withdraw Amount",bd=15, font=("Courier", 30), background="#757575",
+                            command=lambda: withdraw())
+        button1.pack(pady=20, side="left")
+        entry = tk.Entry(self, textvariable=ment, bg="#E91E63").pack(ipady=5, side="left")
+
+
+        button_qwer = tk.Button(self, text="close", command=self.quit)
+        button_qwer.place(relx=0.5, anchor=tk.CENTER)
+        button_qwer.pack(side="left", padx=20, pady=50)
+
+
+app = SeaofBTCapp()
+app.title('AAR-ATM-Bank')
+app.resizable(0,0)
+app.mainloop()
